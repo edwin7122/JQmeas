@@ -100,7 +100,7 @@ class MainFrame extends JFrame {
         remove(mainPane);
 
         if (dataHandler.getTableNum() == 1) {
-            Double[][] table = dataHandler.getTable();
+            String[][] table = dataHandler.getTable();
             jTables[0] = new JTable(table, dataHandler.getColumnName());
             jTables[0].setFillsViewportHeight(true);
             System.err.println("add");
@@ -119,3 +119,5 @@ public class Main {
         MainFrame frame = new MainFrame();
     }
 }
+
+//   /Users/wutsunghan/Desktop/113-2/pd2/final_test_data/3xx1-SD10-19-Rxx1-10-19-Rxx2-17-19-Vgbg-24.2v-B0T-T3.5k15.3mk.txt

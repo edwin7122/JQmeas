@@ -10,11 +10,13 @@ import java.util.ArrayList;
 
 public class DataHandler {
     private int tableNum;
-    private Double[][][] tables = new Double[2][][];
+    private String[][][] tables = new String[2][][];
     private String[][] columnNames = new String[2][];
     private String[] fileName = new String[2];
     private boolean[] available = new boolean[2];
     private boolean[] mostRecentUse = new boolean[2];
+
+    private final int MAXROWS = 100000;
 
     DataHandler() {
         tableNum = 0;
@@ -29,6 +31,7 @@ public class DataHandler {
     }
 
     // for test
+    /* 
     int openTable() {
         System.err.println("openTable()");
         available[0] = true;
@@ -53,7 +56,7 @@ public class DataHandler {
 
         return 1;
     }
-
+    */
     int openTable(String path, String fileType) {
         int status = 0;
         // check if exist
@@ -79,7 +82,7 @@ public class DataHandler {
         mostRecentUse[tableIndex] = true;
         mostRecentUse[1 - tableIndex] = false;
         fileName[tableIndex] = path;
-
+        tableNum = 1;
         // load file
         
 
@@ -88,14 +91,44 @@ public class DataHandler {
 
     int loadFile(int tableIndex, String path, String fileType) {
         int status = 1;
-
+        System.err.println("load file: Start.");
         try {
             BufferedReader reader = new BufferedReader(new FileReader(path));
+            String delimiter;
+            if (fileType == "LabVIEW") {
+                delimiter = "\t";
+                reader.readLine();
+                columnNames[tableIndex] = reader.readLine().split(delimiter);
+                // test
+                System.err.println("column name");
+                for (int i = 0; i < columnNames[tableIndex].length; i++) {
+                    System.err.print(columnNames[tableIndex][i]);
+                    System.err.print(" ");
+                }
+                System.err.println();
+
+                String line;
+                tables[tableIndex] = new String[MAXROWS][];
+                int i = 0;
+                while((line = reader.readLine()) != null) {
+                    tables[tableIndex][i++] = line.split(delimiter);
+                    if (i >= MAXROWS) {
+                        break;
+                    }
+                }
+
+                reader.close();
+            } else {
+                ;
+            }
         } catch (IOException e) {
             status = 2;
             //e.printStackTrace();
             return status;
         }
+
+        System.err.printf("load file: End with status = %d.\n", status);
+
 
         return status;
     }
@@ -103,14 +136,18 @@ public class DataHandler {
     private void removeTable() {
         ;
     }
-
-    public Double[][] getTable() {
-        System.err.println("getTable()");
-        return tables[0];
+    
+    public String[][] getTable() {
+        
+        int choosen = available[0] ? 0 : 1;
+        System.err.printf("getTable: choose %d\n", choosen);
+        return tables[choosen];
     }
     public String[] getColumnName() {
-        System.err.println("getColumnName()");
-        return columnNames[0];
+        
+        int choosen = available[0] ? 0 : 1;
+        System.err.printf("getColumnName: choose %d\n", choosen);
+        return columnNames[choosen];
     }
 
     public Double[][] getTable(int index) {
